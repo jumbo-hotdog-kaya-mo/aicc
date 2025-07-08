@@ -1,11 +1,9 @@
 #![forbid(unsafe_code)]
 
 mod ail;
-mod conf;
 mod parser;
 
 use crate::ail::parse;
-use crate::conf::Configuration;
 
 use std::{env::args, error::Error, fs::File};
 
