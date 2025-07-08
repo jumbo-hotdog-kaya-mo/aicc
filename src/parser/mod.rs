@@ -1,0 +1,97 @@
+#![allow(warnings)]
+
+mod aillexer;
+mod aillistener;
+mod ailparser;
+mod ailvisitor;
+
+pub(crate) use aillexer::LocalTokenFactory;
+pub(crate) use aillexer::ailLexer as AilLexer;
+pub(crate) use ailparser::ailParser as AilParser;
+pub(crate) use ailparser::ailParserContext as AilParserContext;
+pub(crate) use ailparser::ailParserContextType as AilParserContextType;
+//pub(crate) use ailvisitor::ailVisitor as AilVisitor;
+pub(crate) use ailvisitor::ailVisitorCompat as AilVisitorCompat;
+
+pub(crate) use ailparser::ArglistContext;
+pub(crate) use ailparser::AssignlistContext;
+pub(crate) use ailparser::Assign_exprContext as AssignExprContext;
+pub(crate) use ailparser::Assign_stmtContext as AssignStmtContext;
+pub(crate) use ailparser::BlockContext;
+pub(crate) use ailparser::Block_exprContext as BlockExprContext;
+pub(crate) use ailparser::Block_stmtContext as BlockStmtContext;
+pub(crate) use ailparser::CalllistContext;
+pub(crate) use ailparser::Call_exprContext as CallExprContext;
+pub(crate) use ailparser::Call_stmtContext as CallStmtContext;
+pub(crate) use ailparser::ExprContext;
+pub(crate) use ailparser::For_stmtContext as ForStmtContext;
+pub(crate) use ailparser::Func_defContext as FuncDefContext;
+pub(crate) use ailparser::Global_initContext as GlobalInitContext;
+pub(crate) use ailparser::If_stmtContext as IfStmtContext;
+pub(crate) use ailparser::LvalueContext;
+pub(crate) use ailparser::MainContext;
+pub(crate) use ailparser::Modify_stmtContext as ModifyStmtContext;
+pub(crate) use ailparser::RvalueContext;
+pub(crate) use ailparser::StmtContext;
+pub(crate) use ailparser::WhenContext;
+pub(crate) use ailparser::While_stmtContext as WhileStmtContext;
+
+pub(crate) use ailparser::ArglistContextAttrs;
+pub(crate) use ailparser::AssignlistContextAttrs;
+pub(crate) use ailparser::Assign_exprContextAttrs as AssignExprContextAttrs;
+pub(crate) use ailparser::Assign_stmtContextAttrs as AssignStmtContextAttrs;
+pub(crate) use ailparser::BlockContextAttrs;
+pub(crate) use ailparser::Block_exprContextAttrs as BlockExprContextAttrs;
+pub(crate) use ailparser::Block_stmtContextAttrs as BlockStmtContextAttrs;
+pub(crate) use ailparser::CalllistContextAttrs;
+pub(crate) use ailparser::Call_exprContextAttrs as CallExprContextAttrs;
+pub(crate) use ailparser::Call_stmtContextAttrs as CallStmtContextAttrs;
+pub(crate) use ailparser::ExprContextAttrs;
+pub(crate) use ailparser::For_stmtContextAttrs as ForStmtContextAttrs;
+pub(crate) use ailparser::Func_defContextAttrs as FuncDefContextAttrs;
+pub(crate) use ailparser::Global_initContextAttrs as GlobalInitContextAttrs;
+pub(crate) use ailparser::If_stmtContextAttrs as IfStmtContextAttrs;
+pub(crate) use ailparser::LvalueContextAttrs;
+pub(crate) use ailparser::MainContextAttrs;
+pub(crate) use ailparser::Modify_stmtContextAttrs as ModifyStmtContextAttrs;
+pub(crate) use ailparser::RvalueContextAttrs;
+pub(crate) use ailparser::StmtContextAttrs;
+pub(crate) use ailparser::WhenContextAttrs;
+pub(crate) use ailparser::While_stmtContextAttrs as WhileStmtContextAttrs;
+
+pub(crate) mod tokens {
+    use super::aillexer;
+    pub const WS: isize = aillexer::WS;
+    pub const LNCOMMENT: isize = aillexer::LNCOMMENT;
+    pub const BLKCOMMENT: isize = aillexer::BLKCOMMENT;
+    pub const IDENT: isize = aillexer::IDENT;
+    pub const STRING: isize = aillexer::STRING;
+    pub const COLOR: isize = aillexer::COLOR;
+    pub const NUMBER: isize = aillexer::NUMBER;
+    pub const BOOL: isize = aillexer::BOOL;
+    pub const AND: isize = aillexer::AND;
+    pub const CARET: isize = aillexer::CARET;
+    pub const COLON: isize = aillexer::COLON;
+    pub const COMMA: isize = aillexer::COMMA;
+    pub const DOLLAR: isize = aillexer::DOLLAR;
+    pub const DOT: isize = aillexer::DOT;
+    pub const EQUAL: isize = aillexer::EQUAL;
+    pub const EXCLAMATION: isize = aillexer::EXCLAMATION;
+    pub const GLOBAL: isize = aillexer::GLOBAL;
+    pub const HASH: isize = aillexer::HASH;
+    pub const LBRACE: isize = aillexer::LBRACE;
+    pub const LBRACKET: isize = aillexer::LBRACKET;
+    pub const LPAREN: isize = aillexer::LPAREN;
+    pub const MINUS: isize = aillexer::MINUS;
+    pub const PERCENT: isize = aillexer::PERCENT;
+    pub const PIPE: isize = aillexer::PIPE;
+    pub const PLUS: isize = aillexer::PLUS;
+    pub const RBRACE: isize = aillexer::RBRACE;
+    pub const RBRACKET: isize = aillexer::RBRACKET;
+    pub const RPAREN: isize = aillexer::RPAREN;
+    pub const SEMICOLON: isize = aillexer::SEMICOLON;
+    pub const SLASH: isize = aillexer::SLASH;
+    pub const STAR: isize = aillexer::STAR;
+    pub const TILDE: isize = aillexer::TILDE;
+    pub const INVALID: isize = aillexer::INVALID;
+}

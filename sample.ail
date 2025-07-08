@@ -1,0 +1,33 @@
+when $Button:Button1.Click {
+	$Label:Label1.TextColor = #FF0000;
+}
+
+func fizzbuzz(count) {
+	let res = [] in {
+		for i from 0 to count by 1 {
+			base_append(res,
+				let num = i in {
+					if i % 3 == 0 {
+						num = "Fizz";
+					} else if i % 5 == 0 {
+						num = "Buzz";
+					}
+
+					num
+				}
+			);
+		}
+
+		res
+	}
+}
+
+func factorial(num) {
+	let res = 1 in {
+		if num > 0 {
+			res = num * factorial(num - 1);
+		}
+
+		res
+	}
+}
