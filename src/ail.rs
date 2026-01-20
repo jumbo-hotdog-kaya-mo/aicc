@@ -572,9 +572,10 @@ impl<'a> AilVisitorCompat<'a> for Visitor {
         let ctx = ctx.block().unwrap();
         if let Some(expr) = ctx.expr() {
             Some(if ctx.stmt_all().len() == 0 {
-                block("controls_do_then_return", [
+                /*block("controls_do_then_return", [
                     value("VALUE", self.visit_expr(&expr)?)
-                ])
+                ])*/
+                self.visit_expr(&expr)?
             } else {
                 block("controls_do_then_return", [
                     statement("STM", {
