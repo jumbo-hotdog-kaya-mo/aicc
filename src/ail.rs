@@ -331,8 +331,7 @@ impl<'a> AilVisitorCompat<'a> for Visitor {
     fn visit_assign_expr(&mut self, ctx: &AssignExprContext<'a>) -> Self::Return {
         let vars = {
             let assignlist = ctx.assignlist().unwrap();
-            dbg!(assignlist.IDENT_all().iter().map(|ident| ident.get_text()).collect::<Vec<_>>());
-            assignlist.IDENT_all().into_iter().map(|ident| ident.get_text()).zip(assignlist.expr_all().into_iter())
+            assignlist.IDENT_all().into_iter().filter(|ident| ident.symbol.get_token_type() == tokens::IDENT).map(|ident| ident.get_text()).zip(assignlist.expr_all().into_iter())
         };
         let expr = self.visit_block_expr(&ctx.block_expr().unwrap())?;
         let block = block("local_declaration_expression", [
@@ -351,8 +350,7 @@ impl<'a> AilVisitorCompat<'a> for Visitor {
     fn visit_assign_stmt(&mut self, ctx: &AssignStmtContext<'a>) -> Self::Return {
         let vars = {
             let assignlist = ctx.assignlist().unwrap();
-            dbg!(assignlist.IDENT_all().iter().map(|ident| ident.get_text()).collect::<Vec<_>>());
-            assignlist.IDENT_all().into_iter().map(|ident| ident.get_text()).zip(assignlist.expr_all().into_iter())
+            assignlist.IDENT_all().into_iter().filter(|ident| ident.symbol.get_token_type() == tokens::IDENT).map(|ident| ident.get_text()).zip(assignlist.expr_all().into_iter())
         };
         let stmt = self.visit_block_stmt(&ctx.block_stmt().unwrap());
         let block = block("local_declaration_statement", [
