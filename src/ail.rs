@@ -22,6 +22,7 @@ use antlr_rust::{
 use thiserror::Error as ThisError;
 use xmltree::{AttributeMap, Element, XMLNode};
 
+#[macro_export]
 macro_rules! xml {
     () => {};
     ($name:ident $(($($attr_name:expr => $attr_value:expr),+ $(,)?))? $([$($ty:ident $body:expr),+ $(,)?])?) => {{
@@ -73,8 +74,8 @@ impl Visitor {
 
             block
         } else {
-            let name = format!("{} {}",
-                if ctx.GLOBAL().is_some() { "global" } else { "" }, ctx.IDENT(0).unwrap().get_text()
+            let name = format!("{}{}",
+                if ctx.GLOBAL().is_some() { "global " } else { "" }, ctx.IDENT(0).unwrap().get_text()
             );
 
             if let Some(expr) = expr {
@@ -330,7 +331,7 @@ impl<'a> AilVisitorCompat<'a> for Visitor {
     fn visit_assign_expr(&mut self, ctx: &AssignExprContext<'a>) -> Self::Return {
         let vars = {
             let assignlist = ctx.assignlist().unwrap();
-
+            dbg!(assignlist.IDENT_all().iter().map(|ident| ident.get_text()).collect::<Vec<_>>());
             assignlist.IDENT_all().into_iter().map(|ident| ident.get_text()).zip(assignlist.expr_all().into_iter())
         };
         let expr = self.visit_block_expr(&ctx.block_expr().unwrap())?;
@@ -350,7 +351,7 @@ impl<'a> AilVisitorCompat<'a> for Visitor {
     fn visit_assign_stmt(&mut self, ctx: &AssignStmtContext<'a>) -> Self::Return {
         let vars = {
             let assignlist = ctx.assignlist().unwrap();
-
+            dbg!(assignlist.IDENT_all().iter().map(|ident| ident.get_text()).collect::<Vec<_>>());
             assignlist.IDENT_all().into_iter().map(|ident| ident.get_text()).zip(assignlist.expr_all().into_iter())
         };
         let stmt = self.visit_block_stmt(&ctx.block_stmt().unwrap());

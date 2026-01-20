@@ -3,7 +3,6 @@ grammar ail;
 WS : [ \t\f\r\n]+ -> skip;
 LNCOMMENT : '/' '/' ~[\r\n]* ([\r\n] | EOF) -> skip;
 BLKCOMMENT : '/' '*' .*? '*' '/' -> skip;
-IDENT : [a-zA-Z_][a-zA-Z0-9_]*;
 
 STRING: '"' (~'"' | '\\"')* '"'
       | '\'' (~'\'' | '\\\'')* '\'';
@@ -15,6 +14,19 @@ NUMBER : [1-9][0-9]* (DOT [0-9]*)?
 BOOL : 'true'
      | 'false';
 
+BY : 'by';
+ELSE : 'else';
+FOR : 'for';
+FROM : 'from';
+FUNC : 'func';
+GLOBAL : 'global';
+IF : 'if';
+IN : 'in';
+LET : 'let';
+TO : 'to';
+WHEN : 'when';
+WHILE : 'while';
+
 AND : '&';
 CARET : '^';
 COLON : ':';
@@ -23,7 +35,6 @@ DOLLAR : '$';
 DOT : '.';
 EQUAL : '=';
 EXCLAMATION : '!';
-GLOBAL : 'global';
 HASH : '#';
 LBRACE : '{';
 LBRACKET : '[';
@@ -40,10 +51,12 @@ SLASH : '/';
 STAR : '*';
 TILDE : '~';
 
+IDENT : [a-zA-Z_][a-zA-Z0-9_]*;
+
 main : (when | func_def | global_init)* EOF;
 
-when : 'when' DOLLAR IDENT (COLON IDENT)? DOT IDENT block_stmt;
-func_def : 'func' IDENT arglist (block_expr | block_stmt);
+when : WHEN DOLLAR IDENT (COLON IDENT)? DOT IDENT block_stmt;
+func_def : FUNC IDENT arglist (block_expr | block_stmt);
 global_init : GLOBAL IDENT EQUAL expr SEMICOLON;
 
 stmt : if_stmt
@@ -53,12 +66,12 @@ stmt : if_stmt
      | assign_stmt
 	 | modify_stmt;
 
-if_stmt : 'if' expr block_stmt ('else' 'if' expr block_stmt)* ('else' block_stmt)?;
-while_stmt : 'while' expr block_stmt;
-for_stmt : 'for'
-           ( IDENT 'from' expr 'to' expr 'by' expr
-	       | IDENT 'in' expr
-	       | IDENT COMMA IDENT 'in' expr
+if_stmt : IF expr block_stmt (ELSE IF expr block_stmt)* (ELSE block_stmt)?;
+while_stmt : WHILE expr block_stmt;
+for_stmt : FOR
+           ( IDENT FROM expr TO expr BY expr
+	       | IDENT IN expr
+	       | IDENT COMMA IDENT IN expr
 		   )
 		   block_stmt;
 call_stmt : IDENT calllist SEMICOLON;
@@ -100,7 +113,7 @@ block_expr : block;
 
 block : LBRACE stmt* expr? RBRACE;
 
-assignlist : 'let' (IDENT EQUAL expr COMMA)* (IDENT EQUAL expr COMMA?)? 'in';
+assignlist : LET (IDENT EQUAL expr COMMA)* (IDENT EQUAL expr COMMA?)? IN;
 arglist : LPAREN (IDENT COMMA)* (IDENT COMMA?)? RPAREN;
 calllist : LPAREN (expr COMMA)* (expr COMMA?)? RPAREN;
 
