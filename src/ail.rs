@@ -200,15 +200,22 @@ impl<'a> AilVisitorCompat<'a> for Visitor {
 
     fn visit_func_def(&mut self, ctx: &FuncDefContext<'a>) -> Self::Return {
         let is_expr = ctx.block_expr().is_some();
+        let arglist = ctx.arglist().unwrap()
+            .IDENT_all().into_iter()
+            .filter(|ident| ident.symbol.get_token_type() == tokens::IDENT)
+            .map(|ident| ident.get_text());
         let block = block(if is_expr {"procedures_defreturn"} else {"procedures_defnoreturn"}, [
-                xml!(mutation),
-                field("NAME", &ctx.IDENT().unwrap().get_text()),
+                mutation(AttributeMap::new(), arglist.clone().map(|ident| xml!(arg ("name" => ident)))),
+                field("NAME", &ctx.IDENT().unwrap().get_text())
+            ].into_iter()
+            .chain(arglist.enumerate().map(|(i, arg)| field(&format!("VAR{i}"), &arg)))
+            .chain([
                 if is_expr {
                     value("RETURN", self.visit_block_expr(&ctx.block_expr().unwrap())?)
                 } else {
                     statement("STACK", ctx.block_stmt().and_then(|stmt| self.visit_block_stmt(&stmt)))
                 }
-            ]
+            ].into_iter())
         );
 
         Some(block)
