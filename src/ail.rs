@@ -531,7 +531,8 @@ impl<'a> AilVisitorCompat<'a> for Visitor {
         } else if let Some(color) = ctx.COLOR() {
             Some(block("color_white", [field("COLOR", &color.get_text())]))
         } else if let Some(string) = ctx.STRING() {
-            Some(block("text", [field("TEXT", &string.get_text())]))
+            let text = string.get_text();
+            Some(block("text", [field("TEXT", &text[1..text.len()-1].replace("\\\"", "\"").replace("\\'", "'"))]))
         } else if let Some(number) = ctx.NUMBER() {
             let s = &number.get_text();
             let num = if let Some(hex) = s.strip_prefix("0x").or_else(|| s.strip_prefix("0X")) {
