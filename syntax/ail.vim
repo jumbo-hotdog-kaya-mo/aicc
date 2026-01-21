@@ -1,4 +1,4 @@
-syntax keyword AilKeywords if while for from to by else when func global let in
+syntax keyword AilKeywords if while for from to by else when func proc global let in
 syntax match AilCommentLine "//.*$"
 syntax region AilCommentBlock start="/\*" end="\*/"
 syntax region AilStringSingle start="'" skip="\\." end="'" contains=AilEscape

@@ -1,3 +1,12 @@
+global bar = let baz = 4,
+	             quux = 0 in {
+	for i from 0 to baz by 2 {
+		quux = quux + i;
+	}
+
+	quux
+};
+
 when $Button:Button1.Click {
 	$Label:Label1.TextColor = #FF0000;
 }
@@ -30,4 +39,10 @@ func factorial(num) {
 
 		res
 	}
+}
+
+proc foo() {
+	let bar = "\"" in {
+		$Button:Button1.Text = bar;
+	};
 }

@@ -23,6 +23,7 @@ GLOBAL : 'global';
 IF : 'if';
 IN : 'in';
 LET : 'let';
+PROC : 'proc';
 TO : 'to';
 WHEN : 'when';
 WHILE : 'while';
@@ -56,7 +57,8 @@ IDENT : [a-zA-Z_][a-zA-Z0-9_]*;
 main : (when | func_def | global_init)* EOF;
 
 when : WHEN DOLLAR IDENT (COLON IDENT)? DOT IDENT block_stmt;
-func_def : FUNC IDENT arglist (block_expr | block_stmt);
+func_def : FUNC IDENT arglist block_expr
+         | PROC IDENT arglist block_stmt;
 global_init : GLOBAL IDENT EQUAL expr SEMICOLON;
 
 stmt : if_stmt
