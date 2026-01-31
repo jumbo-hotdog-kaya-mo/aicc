@@ -6,6 +6,7 @@ use std::{
     borrow::Cow,
     convert::Into,
     io::{self, Read},
+    rc::Rc
 };
 
 use antlr_rust::{
@@ -13,6 +14,7 @@ use antlr_rust::{
     common_token_stream::CommonTokenStream,
     error_listener::ErrorListener,
     errors::ANTLRError,
+    parser_rule_context::ParserRuleContext,
     token::Token,
     token_factory::TokenFactory,
     tree::{ParseTree, ParseTreeVisitorCompat},
@@ -54,6 +56,233 @@ struct AilVocabulary<'a>(&'a dyn Vocabulary);
 struct Visitor(String);
 
 impl Visitor {
+    fn try_builtin_expr(&mut self, name: &str, args: &[Rc<ExprContext>]) -> Option<Element> {
+        let mut math_abs_sin = |is_trig: bool, op: &str| -> Element {
+            if is_trig {
+                block("math_sin", [
+                    field("OP", op),
+                    value("NUM", self.visit_expr(&args[0]).unwrap())
+                ])
+            } else {
+                block("math_abs", [
+                    field("OP", op),
+                    value("NUM", self.visit_expr(&args[0]).unwrap())
+                ])
+            }
+        };
+
+        match name {
+            "sqrt" => Some(math_abs_sin(false, "ROOT")),
+            "abs" => Some(math_abs_sin(false, "ABS")),
+            "log" => Some(math_abs_sin(false, "LN")),
+            "exp" => Some(math_abs_sin(false, "EXP")),
+            "round" => Some(math_abs_sin(false, "ROUND")),
+            "ceil" => Some(math_abs_sin(false, "CEILING")),
+            "floor" => Some(math_abs_sin(false, "FLOOR")),
+            "sin" => Some(math_abs_sin(true, "SIN")),
+            "cos" => Some(math_abs_sin(true, "COS")),
+            "tan" => Some(math_abs_sin(true, "TAN")),
+            "arcsin" => Some(math_abs_sin(true, "ASIN")),
+            "arccos" => Some(math_abs_sin(true, "ACOS")),
+            "arctan" => Some(math_abs_sin(true, "ATAN")),
+            "atan2" => Some(block("math_atan2", [
+                value("Y", self.visit_expr(&args[0]).unwrap()),
+                value("X", self.visit_expr(&args[1]).unwrap()),
+            ])),
+            "contains" => Some(block("procedures_callreturn", [
+                field("PROCNAME", "ail$rt$contains"),
+                value("ARG0", self.visit_expr(&args[0]).unwrap()),
+                value("ARG1", self.visit_expr(&args[1]).unwrap())
+            ])),
+            "len" => Some(block("procedures_callreturn", [
+                field("PROCNAME", "ail$rt$len"),
+                value("ARG0", self.visit_expr(&args[0]).unwrap())
+            ])),
+            "lexcmp" => Some(block("text_compare", [
+                field("OP", match args[1].get_text().as_str() {
+                    "lt" => "LT",
+                    "gt" => "GT",
+                    "eq" => "EQUAL",
+                    "ne" => "NEQ",
+                    other => {
+                        let tok = args[1].start();
+                        eprintln!("{}:{}:{}: error: expected any of {{lt, gt, eq, ne}}, got {}",
+                            self.0,
+                            tok.get_line(),
+                            tok.get_column() + 1,
+                            other
+                        );
+                        return None;
+                    }
+                })
+            ])),
+            "trim" => Some(block("text_trim", [
+                value("TEXT", self.visit_expr(&args[0]).unwrap())
+            ])),
+            "to_upper" => Some(block("text_changeCase", [
+                field("OP", "UPCASE"),
+                value("TEXT", self.visit_expr(&args[0]).unwrap())
+            ])),
+            "to_lower" => Some(block("text_changeCase", [
+                field("OP", "DOWNCASE"),
+                value("TEXT", self.visit_expr(&args[0]).unwrap())
+            ])),
+            "find" => Some(block("procedures_callreturn", [
+                field("PROCNAME", "ail$rt$find"),
+                value("ARG0", self.visit_expr(&args[0]).unwrap()),
+                value("ARG1", self.visit_expr(&args[1]).unwrap())
+            ])),
+            "contains_all" => Some(block("text_contains", [
+                field("OP", "CONTAINS_ALL"),
+                value("TEXT", self.visit_expr(&args[0]).unwrap()),
+                value("PIECE", self.visit_expr(&args[1]).unwrap())
+            ])),
+            "split" => Some(block("procedures_callreturn", [
+                field("PROCNAME", "ail$rt$split"),
+                value("ARG0", self.visit_expr(&args[0]).unwrap()),
+                value("ARG1", self.visit_expr(&args[1]).unwrap())
+            ])),
+            "split_once" => Some(block("procedures_callreturn", [
+                field("PROCNAME", "ail$rt$split_once"),
+                value("ARG0", self.visit_expr(&args[0]).unwrap()),
+                value("ARG1", self.visit_expr(&args[1]).unwrap())
+            ])),
+            "segment" => Some(block("text_segment", [
+                value("TEXT", self.visit_expr(&args[0]).unwrap()),
+                value("START", self.visit_expr(&args[1]).unwrap()),
+                value("LENGTH", self.visit_expr(&args[2]).unwrap())
+            ])),
+            "replace" => Some(block("text_replace_all", [
+                value("TEXT", self.visit_expr(&args[0]).unwrap()),
+                value("SEGMENT", self.visit_expr(&args[1]).unwrap()),
+                value("REPLACEMENT", self.visit_expr(&args[2]).unwrap())
+            ])),
+            "reverse" => Some(block("procedures_callreturn", [
+                field("PROCNAME", "ail$rt$reverse"),
+                value("ARG0", self.visit_expr(&args[0]).unwrap()),
+            ])),
+            "replace_multi" => Some(block("text_replace_mappings", [
+                field("OP", match args[2].get_text().as_str() {
+                    "ordered" => "DICTIONARY_ORDER",
+                    "max_munch" => "LONGEST_STRING_FIRST",
+                    other => {
+                        let tok = args[1].start();
+                        eprintln!("{}:{}:{}: error: expected any of {{max_munch, ordered}}, got {}",
+                            self.0,
+                            tok.get_line(),
+                            tok.get_column() + 1,
+                            other
+                        );
+                        return None;
+                    }
+                }),
+                value("MAPPINGS", self.visit_expr(&args[1]).unwrap()),
+                value("TEXT", self.visit_expr(&args[0]).unwrap())
+            ])),
+            "copy" => Some(block("procedures_callreturn", [
+                field("PROCNAME", "ail$rt$copy"),
+                value("ARG0", self.visit_expr(&args[0]).unwrap()),
+            ])),
+            "lookup_pairs" => Some(block("lists_lookup_in_pairs", [
+                value("KEY", self.visit_expr(&args[0]).unwrap()),
+                value("LIST", self.visit_expr(&args[1]).unwrap()),
+                value("NOTFOUND", self.visit_expr(&args[2]).unwrap())
+            ])),
+            "join" => Some(block("lists_join_with_separator", [
+                value("SEPARATOR", self.visit_expr(&args[0]).unwrap()),
+                value("LIST", self.visit_expr(&args[1]).unwrap())
+            ])),
+            "map" => Some(block("lists_map", [
+                field("VAR", args[1].get_text().as_str()),
+                value("LIST", self.visit_expr(&args[0]).unwrap()),
+                value("TO", self.visit_expr(&args[2]).unwrap())
+            ])),
+            "filter" => Some(block("lists_filter", [
+                field("VAR", args[1].get_text().as_str()),
+                value("LIST", self.visit_expr(&args[0]).unwrap()),
+                value("TEST", self.visit_expr(&args[2]).unwrap())
+            ])),
+            "reduce" => Some(block("lists_reduce", [
+                field("VAR1", args[3].get_text().as_str()),
+                field("VAR2", args[2].get_text().as_str()),
+                value("LIST", self.visit_expr(&args[0]).unwrap()),
+                value("INITANSWER", self.visit_expr(&args[1]).unwrap()),
+                value("COMBINE", self.visit_expr(&args[4]).unwrap())
+            ])),
+            "sort" => Some(match args.len() {
+                1 => block("lists_sort", [
+                    value("LIST", self.visit_expr(&args[0]).unwrap()),
+                ]),
+                3 => block("lists_sort_key", [
+                    field("VAR", args[1].get_text().as_str()),
+                    value("LIST", self.visit_expr(&args[0]).unwrap()),
+                    value("KEY", self.visit_expr(&args[2]).unwrap())
+                ]),
+                4 => block("lists_sort_comparator", [
+                    field("VAR1", args[2].get_text().as_str()),
+                    field("VAR2", args[1].get_text().as_str()),
+                    value("LIST", self.visit_expr(&args[0]).unwrap()),
+                    value("COMPARE", self.visit_expr(&args[3]).unwrap())
+                ]),
+                _ => {
+                    let tok = args[1].start();
+                    eprintln!("{}:{}:{}: error: incorrect argument count for `sort'",
+                        self.0,
+                        tok.get_line(),
+                        tok.get_column() + 1,
+                    );
+                    return None;
+                }
+            }),
+            "min" => Some(block("lists_minimum_value", [
+                field("VAR1", args[1].get_text().as_str()),
+                field("VAR2", args[2].get_text().as_str()),
+                value("LIST", self.visit_expr(&args[0]).unwrap()),
+                value("COMPARE", self.visit_expr(&args[3]).unwrap())
+            ])),
+            "max" => Some(block("lists_maximum_value", [
+                field("VAR1", args[1].get_text().as_str()),
+                field("VAR2", args[2].get_text().as_str()),
+                value("LIST", self.visit_expr(&args[0]).unwrap()),
+                value("COMPARE", self.visit_expr(&args[3]).unwrap())
+            ])),
+            "slice" => Some(block("lists_slice", [
+                value("LIST", self.visit_expr(&args[0]).unwrap()),
+                value("INDEX1", self.visit_expr(&args[1]).unwrap()),
+                value("INDEX2", self.visit_expr(&args[2]).unwrap())
+            ])),
+            "path_get" => Some(block("dictionaries_recursive_lookup", [
+                value("KEYS", self.visit_expr(&args[1]).unwrap()),
+                value("DICT", self.visit_expr(&args[0]).unwrap()),
+                value("NOTFOUND", self.visit_expr(&args[2]).unwrap())
+            ])),
+            "keys" => Some(block("dictionaries_getters", [
+                field("OP", "KEYS"),
+                value("DICT", self.visit_expr(&args[0]).unwrap()),
+            ])),
+            "values" => Some(block("dictionaries_getters", [
+                field("OP", "VALUES"),
+                value("DICT", self.visit_expr(&args[0]).unwrap()),
+            ])),
+            "to_pairs" => Some(block("dictionaries_dict_to_alist", [
+                value("DICT", self.visit_expr(&args[0]).unwrap()),
+            ])),
+            "to_dict" => Some(block("dictionaries_alist_to_dict", [
+                value("PAIRS", self.visit_expr(&args[0]).unwrap()),
+            ])),
+            "path_all" => Some(block("dictionaries_walk_all", [])),
+            "path_walk" => Some(block("dictionaries_walk_tree", [
+                value("PATH", self.visit_expr(&args[1]).unwrap()),
+                value("DICT", self.visit_expr(&args[0]).unwrap()),
+            ])),
+            _ => None
+        }
+    }
+
+    fn try_builtin_stmt(&mut self, name: &str, args: &[Rc<ExprContext>]) -> Option<Element> {
+        None
+    }
+
     fn visit_lvalue<'a>(&mut self, ctx: &LvalueContext<'a>, expr: Option<&ExprContext<'a>>) -> <Self as ParseTreeVisitorCompat<'a>>::Return {
         Some(if ctx.DOLLAR().is_some() {
             let mut block = block("component_set_get", [
@@ -312,27 +541,41 @@ impl<'a> AilVisitorCompat<'a> for Visitor {
     }
 
     fn visit_call_expr(&mut self, ctx: &CallExprContext<'a>) -> Self::Return {
-        let mut block = block("procedures_callreturn", [
-            field("PROCNAME", &ctx.IDENT().unwrap().get_text())
-        ]);
+        let name = ctx.IDENT().unwrap().get_text();
+        let args = ctx.calllist().unwrap().expr_all();
 
-        block.children.extend(ctx.calllist().unwrap().expr_all().into_iter().enumerate().map(
-            |(i, expr)| XMLNode::Element(value(&format!("ARG{i}"), self.visit_expr(&expr).unwrap()))
-        ));
+        Some(if let Some(block) = self.try_builtin_expr(&name, &args[..]) {
+            block
+        } else {
+            let mut block = block("procedures_callreturn", [
+                field("PROCNAME", &name)
+            ]);
 
-        Some(block)
+            block.children.extend(args.into_iter().enumerate().map(
+                |(i, expr)| XMLNode::Element(value(&format!("ARG{i}"), self.visit_expr(&expr).unwrap()))
+            ));
+
+            block
+        })
     }
 
     fn visit_call_stmt(&mut self, ctx: &CallStmtContext<'a>) -> Self::Return {
-        let mut block = block("procedures_callnoreturn", [
-            field("PROCNAME", &ctx.IDENT().unwrap().get_text())
-        ]);
+        let name = ctx.IDENT().unwrap().get_text();
+        let args = ctx.calllist().unwrap().expr_all();
 
-        block.children.extend(ctx.calllist().unwrap().expr_all().into_iter().enumerate().map(
-            |(i, expr)| XMLNode::Element(value(&format!("ARG{i}"), self.visit_expr(&expr).unwrap()))
-        ));
+        Some(if let Some(block) = self.try_builtin_stmt(&name, &args[..]) {
+            block
+        } else {
+            let mut block = block("procedures_callnoreturn", [
+                field("PROCNAME", &name)
+            ]);
 
-        Some(block)
+            block.children.extend(args.into_iter().enumerate().map(
+                |(i, expr)| XMLNode::Element(value(&format!("ARG{i}"), self.visit_expr(&expr).unwrap()))
+            ));
+
+            block
+        })
     }
 
     fn visit_assign_expr(&mut self, ctx: &AssignExprContext<'a>) -> Self::Return {
@@ -519,7 +762,7 @@ impl<'a> AilVisitorCompat<'a> for Visitor {
         } else if ctx.LBRACE().is_some() {
             let dict_len = ctx.expr_all().len();
             Some(block("dictionaries_create_with", 
-                [mutation(AttributeMap::from([("items".into(), dict_len.to_string())]), [])].into_iter().chain(
+                [mutation(AttributeMap::from([("items".into(), (dict_len / 2).to_string())]), [])].into_iter().chain(
                     ctx.expr_all().as_chunks::<2>().0.into_iter().enumerate().map(|(i, kv)| value(&format!("ADD{i}"), block("pair", [
                         value("KEY", self.visit_expr(&kv[0]).unwrap()),
                         value("VALUE", self.visit_expr(&kv[1]).unwrap())
@@ -601,7 +844,7 @@ impl<'a> AilVisitorCompat<'a> for Visitor {
             })
         } else {
             let tok = &ctx.LBRACE().unwrap().symbol;
-            eprintln!("{}:{}:{} error: block does not return a value", self.0, tok.get_line(), tok.get_column());
+            eprintln!("{}:{}:{} error: block does not return a value", self.0, tok.get_line(), tok.get_column() + 1);
             None
         }
     }
