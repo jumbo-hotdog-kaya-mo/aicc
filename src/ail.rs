@@ -280,7 +280,29 @@ impl Visitor {
     }
 
     fn try_builtin_stmt(&mut self, name: &str, args: &[Rc<ExprContext>]) -> Option<Element> {
-        None
+        match name {
+            "insert" => Some(block("lists_insert_item", [
+                value("LIST", self.visit_expr(&args[0]).unwrap()),
+                value("INDEX", self.visit_expr(&args[1]).unwrap()),
+                value("ITEM", self.visit_expr(&args[2]).unwrap()),
+            ])),
+            "remove" => Some(block("procedures_callnoreturn", [
+                field("PROCNAME", "ail$rt$remove"),
+                value("ARG0", self.visit_expr(&args[0]).unwrap()),
+                value("ARG1", self.visit_expr(&args[1]).unwrap()),
+            ])),
+            "append" => Some(block("procedures_callnoreturn", [
+                field("PROCNAME", "ail$rt$append"),
+                value("ARG0", self.visit_expr(&args[0]).unwrap()),
+                value("ARG1", self.visit_expr(&args[1]).unwrap()),
+            ])),
+            "path_set" => Some(block("dictionaries_recursive_set", [
+                value("KEYS", self.visit_expr(&args[1]).unwrap()),
+                value("DICT", self.visit_expr(&args[0]).unwrap()),
+                value("VALUE", self.visit_expr(&args[2]).unwrap())
+            ])),
+            _ => None
+        }
     }
 
     fn visit_lvalue<'a>(&mut self, ctx: &LvalueContext<'a>, expr: Option<&ExprContext<'a>>) -> <Self as ParseTreeVisitorCompat<'a>>::Return {
