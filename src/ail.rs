@@ -329,13 +329,33 @@ impl Visitor {
                 if ctx.GLOBAL().is_some() { "global " } else { "" }, ctx.IDENT(0).unwrap().get_text()
             );
 
-            if let Some(expr) = expr {
-                block("lexical_variable_set", [
+            match (ctx.expr(), expr) {
+                (Some(key), Some(expr)) => block("procedures_callnoreturn", [
+                    field("PROCNAME", "ail$rt$setprop"),
+                    value("ARG0", block("lexical_variable_get", [
+                        field("VAR", &name)
+                    ])),
+                    value("ARG1", self.visit_expr(&key).unwrap()),
+                    value("ARG2", self.visit_expr(expr).unwrap()),
+                ]),
+                (Some(key), None) => {
+                    let tok = &ctx.LBRACKET().unwrap().symbol;
+                    block("procedures_callreturn", [
+                        field("PROCNAME", "ail$rt$getprop"),
+                        value("ARG0", block("lexical_variable_get", [
+                            field("VAR", &name)
+                        ])),
+                        value("ARG1", self.visit_expr(&key).unwrap()),
+                        value("ARG2", block("text", [
+                            field("TEXT", &format!("{}:{}:{}: no such key {} in {}", self.0, tok.get_line(), tok.get_column() + 1, key.get_text(), name))
+                        ]))
+                    ])
+                },
+                (None, Some(expr)) => block("lexical_variable_set", [
                     field("VAR", &name),
                     value("VALUE", self.visit_expr(expr).unwrap())
-                ])
-            } else {
-                block("lexical_variable_get", [
+                ]),
+                (None, None) => block("lexical_variable_get", [
                     field("VAR", &name),
                 ])
             }
