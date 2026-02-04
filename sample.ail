@@ -46,3 +46,33 @@ proc foo() {
 		$Button:Button1.Text = bar;
 	};
 }
+
+func baz() {
+	{"Foo": 1}
+}
+
+func soup() {
+	sqrt(3)
+}
+
+func hello() {
+	len("bye") + len([1, 2])
+}
+
+func test() {
+	reduce(
+		filter(
+			map([1, 2, 3], it, it * 2),
+			it, it < 5
+		),
+		0, acc, it, acc + it
+	)
+}
+
+proc cyka() {
+	let foo = [],
+		bar = {1: 2} in {
+		foo[2] = 3;
+		bar[foo[2]] = 4;
+	};
+}
