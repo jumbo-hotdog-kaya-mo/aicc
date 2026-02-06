@@ -4,7 +4,23 @@ an actual programming language for ai2 since dragging blocks is a pile of dogshi
 
 # The language
 
-### Basic reference:
+## `aicc` command
+
+### Usage
+
+```
+./aicc [-p] srcfile outfile
+```
+
+Compiles source `srcfile` into xml or if `-p` is specified, output into a bunch of pngs.
+
+### Notes
+
+**You most likely want to use `-p` to use outputs for app inventor, it will become the default in a future version**
+  
+If `-p` is specified, `outfile` becomes a prefix for generated output pngs (`outfile0.png`, `outfile1.png`, ...)
+
+## Basic reference:
 
 ### Literals
 - boolean
@@ -37,6 +53,7 @@ an actual programming language for ai2 since dragging blocks is a pile of dogshi
     ```
     #FFFFFF
     #(0xFF, 255, 0b11111111)
+    #(red, green, blue, alpha)
     ```
 
 - array
@@ -139,3 +156,70 @@ proc bar(baz) {
     do_stuff(baz + 1);
 }
 ```
+
+## Builtin functions
+
+### Generic
+
+- `append(obj1, obj2)`
+- `contains(haystack, needle)`
+- `copy(obj)`
+- `find(haystack, needle)`
+- `len(obj)`
+- `remove(obj, prop)`
+- `reverse(obj)`
+
+### Numerical
+
+- `abs(num)`
+- `arccos(num)`
+- `arcsin(num)`
+- `arctan(num)`
+- `atan2(y, x)`
+- `ceil(num)`
+- `cos(num)`
+- `exp(num)`
+- `floor(num)`
+- `log(num)`
+- `round(num)`
+- `sin(num)`
+- `sqrt(num)`
+- `tan(num)`
+
+### Strings
+
+- `contains_all(text, substrings)`
+- `lexcmp(text1, [eq | ne | lt | gt], text2)`
+- `replace(text, search, replacement)`
+- `replace_multi(text, mappings, [max_munch | ordered])`
+- `segment(text, start, length)`
+- `split(text, separator)`
+- `split_once(text, separator)`
+- `to_lower(text)`
+- `to_upper(text)`
+- `trim(text)`
+
+### Arrays
+
+- `filter(arr, var, func)`
+- `join(arr, sep)`
+- `lookup_pairs(arr, key, default)`
+- `map(arr, var, func)`
+- `max(arr)`
+- `min(arr)`
+- `reduce(arr, init, acc, cur, func)`
+- `slice(arr, index1, index2)`
+- `sort(arr)` | `sort(arr, item, func)` | `sort(arr, item1, item2, func)`
+
+### Dictionaries
+
+- `keys(dict)`
+- `path_all()`
+
+> NOTE: when using `path_get` or `path_walk`, ensure array indices are 1-indexed
+
+- `path_get(dict, keys, default)`
+- `path_walk(dict, keys)`
+- `to_dict(arr)`
+- `to_pairs(dict)`
+- `values(dict)`
