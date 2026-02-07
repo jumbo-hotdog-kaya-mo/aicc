@@ -1,3 +1,12 @@
+global bar = let baz = 4,
+	             quux = 0 in {
+	for i from 0 to baz by 2 {
+		quux = quux + i;
+	}
+
+	quux
+};
+
 when $Button:Button1.Click {
 	$Label:Label1.TextColor = #FF0000;
 }
@@ -5,7 +14,7 @@ when $Button:Button1.Click {
 func fizzbuzz(count) {
 	let res = [] in {
 		for i from 0 to count by 1 {
-			base_append(res,
+			append(res,
 				let num = i in {
 					if i % 3 == 0 {
 						num = "Fizz";
@@ -30,4 +39,40 @@ func factorial(num) {
 
 		res
 	}
+}
+
+proc foo() {
+	let bar = "\"" in {
+		$Button:Button1.Text = bar;
+	};
+}
+
+func baz() {
+	{"Foo": 1}
+}
+
+func soup() {
+	sqrt(3)
+}
+
+func hello() {
+	len("bye") + len([1, 2])
+}
+
+func test() {
+	reduce(
+		filter(
+			map([1, 2, 3], it, it * 2),
+			it, it < 5
+		),
+		0, acc, it, acc + it
+	)
+}
+
+proc cyka() {
+	let foo = [],
+		bar = {1: 2} in {
+		foo[2] = 3;
+		bar[foo[2]] = 4;
+	};
 }
