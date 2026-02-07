@@ -4,7 +4,13 @@ an actual programming language for ai2 since dragging blocks is a pile of dogshi
 
 # The language
 
+> [!TIP]
+> To get an idea of the language, read `sample.ail` in the project directory
+
 ## `aicc` command
+
+> [!WARNING]
+> WARNING: ERROR MESSAGES ARE HORRIBLE, DO NOT RELY ON THOSE TO FIX MISTAKES.
 
 ### Usage
 
@@ -137,6 +143,9 @@ $Label:MyLabel.Text = let text = "hello" in {
 
 ### Event handler
 
+> [!IMPORTANT]
+> Unfortunately, you have to consult app inventor block editor for the names of arguments. Arguments will be documented in a future release.
+
 ```
 when $Button:MyButton.Click {
     /* clicked */
@@ -218,6 +227,7 @@ proc bar(baz) {
 - `func keys(dict)`
 - `func path_all()`
 
+> [!NOTE]
 > NOTE: when using `path_get` or `path_walk`, ensure array indices are 1-indexed
 
 - `func path_get(dict, path, default)`

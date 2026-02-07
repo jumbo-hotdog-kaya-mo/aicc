@@ -14,7 +14,7 @@ when $Button:Button1.Click {
 func fizzbuzz(count) {
 	let res = [] in {
 		for i from 0 to count by 1 {
-			base_append(res,
+			append(res,
 				let num = i in {
 					if i % 3 == 0 {
 						num = "Fizz";
