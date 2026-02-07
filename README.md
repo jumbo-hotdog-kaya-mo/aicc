@@ -161,65 +161,67 @@ proc bar(baz) {
 
 ### Generic
 
-- `append(obj1, obj2)`
-- `contains(haystack, needle)`
-- `copy(obj)`
-- `find(haystack, needle)`
-- `len(obj)`
-- `remove(obj, prop)`
-- `reverse(obj)`
+- `proc append(obj1, obj2)`
+- `func contains(haystack, needle)`
+- `func copy(obj)`
+- `func find(haystack, needle)`
+- `func len(obj)`
+- `proc path_set(obj, path, value)`
+- `proc remove(obj, prop)`
+- `func reverse(obj)`
 
 ### Numerical
 
-- `abs(num)`
-- `arccos(num)`
-- `arcsin(num)`
-- `arctan(num)`
-- `atan2(y, x)`
-- `ceil(num)`
-- `cos(num)`
-- `exp(num)`
-- `floor(num)`
-- `log(num)`
-- `round(num)`
-- `sin(num)`
-- `sqrt(num)`
-- `tan(num)`
+- `func abs(num)`
+- `func arccos(num)`
+- `func arcsin(num)`
+- `func arctan(num)`
+- `func atan2(y, x)`
+- `func ceil(num)`
+- `func cos(num)`
+- `func exp(num)`
+- `func floor(num)`
+- `func log(num)`
+- `func round(num)`
+- `func sin(num)`
+- `func sqrt(num)`
+- `func tan(num)`
 
 ### Strings
 
-- `contains_all(text, substrings)`
-- `lexcmp(text1, [eq | ne | lt | gt], text2)`
-- `replace(text, search, replacement)`
-- `replace_multi(text, mappings, [max_munch | ordered])`
-- `segment(text, start, length)`
-- `split(text, separator)`
-- `split_once(text, separator)`
-- `to_lower(text)`
-- `to_upper(text)`
-- `trim(text)`
+- `func contains_all(text, substrings)`
+- `func lexcmp(text1, [eq | ne | lt | gt], text2)`
+- `func replace(text, search, replacement)`
+- `func replace_multi(text, mappings, [max_munch | ordered])`
+- `func segment(text, start, length)`
+- `func split(text, separator)`
+- `func split_once(text, separator)`
+- `func to_lower(text)`
+- `func to_upper(text)`
+- `func trim(text)`
 
 ### Arrays
 
-- `filter(arr, var, func)`
-- `join(arr, sep)`
-- `lookup_pairs(arr, key, default)`
-- `map(arr, var, func)`
-- `max(arr)`
-- `min(arr)`
-- `reduce(arr, init, acc, cur, func)`
-- `slice(arr, index1, index2)`
-- `sort(arr)` | `sort(arr, item, func)` | `sort(arr, item1, item2, func)`
+- `func filter(arr, var, func)`
+- `proc insert(arr, idx, item)`
+- `func join(arr, sep)`
+- `func lookup_pairs(arr, key, default)`
+- `func map(arr, var, func)`
+- `func max(arr)`
+- `func min(arr)`
+- `func reduce(arr, init, acc, cur, func)`
+- `func slice(arr, idx1, idx2)`
+- `func sort(arr)` | `func sort(arr, item, func)` | `func sort(arr, item1, item2, func)`
 
 ### Dictionaries
 
-- `keys(dict)`
-- `path_all()`
+- `func keys(dict)`
+- `func path_all()`
 
 > NOTE: when using `path_get` or `path_walk`, ensure array indices are 1-indexed
 
-- `path_get(dict, keys, default)`
-- `path_walk(dict, keys)`
-- `to_dict(arr)`
-- `to_pairs(dict)`
-- `values(dict)`
+- `func path_get(dict, path, default)`
+- `func path_walk(dict, path)`
+- `func to_dict(arr)`
+- `func to_pairs(dict)`
+- `func values(dict)`
