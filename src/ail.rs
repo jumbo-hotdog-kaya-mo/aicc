@@ -184,13 +184,13 @@ impl Visitor {
                 value("ARG0", self.visit_expr(&args[0]).unwrap()),
             ])),
             "lookup_pairs" => Some(block("lists_lookup_in_pairs", [
-                value("KEY", self.visit_expr(&args[0]).unwrap()),
-                value("LIST", self.visit_expr(&args[1]).unwrap()),
+                value("KEY", self.visit_expr(&args[1]).unwrap()),
+                value("LIST", self.visit_expr(&args[0]).unwrap()),
                 value("NOTFOUND", self.visit_expr(&args[2]).unwrap())
             ])),
             "join" => Some(block("lists_join_with_separator", [
-                value("SEPARATOR", self.visit_expr(&args[0]).unwrap()),
-                value("LIST", self.visit_expr(&args[1]).unwrap())
+                value("SEPARATOR", self.visit_expr(&args[1]).unwrap()),
+                value("LIST", self.visit_expr(&args[0]).unwrap())
             ])),
             "map" => Some(block("lists_map", [
                 field("VAR", args[1].get_text().as_str()),
@@ -219,8 +219,8 @@ impl Visitor {
                     value("KEY", self.visit_expr(&args[2]).unwrap())
                 ]),
                 4 => block("lists_sort_comparator", [
-                    field("VAR1", args[2].get_text().as_str()),
-                    field("VAR2", args[1].get_text().as_str()),
+                    field("VAR1", args[1].get_text().as_str()),
+                    field("VAR2", args[2].get_text().as_str()),
                     value("LIST", self.visit_expr(&args[0]).unwrap()),
                     value("COMPARE", self.visit_expr(&args[3]).unwrap())
                 ]),
