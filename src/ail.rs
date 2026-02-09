@@ -678,8 +678,8 @@ impl<'a> AilVisitorCompat<'a> for Visitor {
                 ])),
                 _ => panic!("ICE: unexpected parsing op {}", op.get_text())
             }
-        } else if let Some(op) = ctx.binary_op() {
-            Some(match op.get_text().as_str() {
+        } else if let Some(op) = &ctx.binary_op {
+            Some(match op.get_text() {
                 "*" => block("math_multiply", [
                     mutation(AttributeMap::from([
                         ("items".into(), "2".into())

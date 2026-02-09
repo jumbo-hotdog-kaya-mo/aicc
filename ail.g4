@@ -66,30 +66,35 @@ stmt : if_stmt
      | for_stmt
      | call_stmt
      | assign_stmt
-	 | modify_stmt;
+     | modify_stmt;
 
 if_stmt : IF expr block_stmt (ELSE IF expr block_stmt)* (ELSE block_stmt)?;
 while_stmt : WHILE expr block_stmt;
 for_stmt : FOR
            ( IDENT FROM expr TO expr BY expr
-	       | IDENT IN expr
-	       | IDENT COMMA IDENT IN expr
-		   )
-		   block_stmt;
+           | IDENT IN expr
+           | IDENT COMMA IDENT IN expr
+           )
+           block_stmt;
 call_stmt : IDENT calllist SEMICOLON;
 assign_stmt : assignlist block_stmt SEMICOLON;
 modify_stmt : lvalue EQUAL expr SEMICOLON;
 
 unary_op: PLUS | MINUS | EXCLAMATION;
 
-binary_op: STAR | SLASH | PERCENT | PLUS | MINUS | AND | CARET | PIPE | '==' | '!=' | '<' | '>' | '<=' | '>=' | '&&' | '||';
-
 expr : LPAREN expr RPAREN
      | unary_op expr
-	 | expr binary_op expr
-	 | block_expr
-	 | call_expr
-	 | assign_expr
+     | expr binary_op=(STAR | SLASH | PERCENT) expr
+     | expr binary_op=(PLUS | MINUS) expr
+     | expr binary_op=AND expr
+     | expr binary_op=CARET expr
+     | expr binary_op=PIPE expr
+     | expr binary_op=('==' | '!=' | '<' | '>' | '<=' | '>=') expr
+     | expr binary_op='&&' expr
+     | expr binary_op='||' expr
+     | block_expr
+     | call_expr
+     | assign_expr
      | '#(' expr COMMA expr COMMA expr (COMMA expr?)? RPAREN
      | LBRACKET (expr COMMA)* (expr COMMA?)? RBRACKET
      | LBRACE (expr COLON expr COMMA)* (expr COLON expr COMMA?)? RBRACE
@@ -104,8 +109,8 @@ rvalue : DOLLAR IDENT COLON IDENT
        | lvalue;
 
 lvalue : IDENT (LBRACKET expr RBRACKET)?
-    | GLOBAL IDENT (LBRACKET expr RBRACKET)?
-    | DOLLAR IDENT COLON IDENT DOT IDENT;
+       | GLOBAL IDENT (LBRACKET expr RBRACKET)?
+       | DOLLAR IDENT COLON IDENT DOT IDENT;
 
 assign_expr : assignlist block_expr;
 call_expr : IDENT calllist;

@@ -125,16 +125,6 @@ fn enter_unary_op(&mut self, _ctx: &Unary_opContext<'input>) { }
  */
 fn exit_unary_op(&mut self, _ctx: &Unary_opContext<'input>) { }
 /**
- * Enter a parse tree produced by {@link ailParser#binary_op}.
- * @param ctx the parse tree
- */
-fn enter_binary_op(&mut self, _ctx: &Binary_opContext<'input>) { }
-/**
- * Exit a parse tree produced by {@link ailParser#binary_op}.
- * @param ctx the parse tree
- */
-fn exit_binary_op(&mut self, _ctx: &Binary_opContext<'input>) { }
-/**
  * Enter a parse tree produced by {@link ailParser#expr}.
  * @param ctx the parse tree
  */

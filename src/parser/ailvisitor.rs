@@ -81,12 +81,6 @@ pub trait ailVisitor<'input>: ParseTreeVisitor<'input,ailParserContextType>{
 	fn visit_unary_op(&mut self, ctx: &Unary_opContext<'input>) { self.visit_children(ctx) }
 
 	/**
-	 * Visit a parse tree produced by {@link ailParser#binary_op}.
-	 * @param ctx the parse tree
-	 */
-	fn visit_binary_op(&mut self, ctx: &Binary_opContext<'input>) { self.visit_children(ctx) }
-
-	/**
 	 * Visit a parse tree produced by {@link ailParser#expr}.
 	 * @param ctx the parse tree
 	 */
@@ -252,14 +246,6 @@ pub trait ailVisitorCompat<'input>:ParseTreeVisitorCompat<'input, Node= ailParse
 		}
 
 	/**
-	 * Visit a parse tree produced by {@link ailParser#binary_op}.
-	 * @param ctx the parse tree
-	 */
-		fn visit_binary_op(&mut self, ctx: &Binary_opContext<'input>) -> Self::Return {
-			self.visit_children(ctx)
-		}
-
-	/**
 	 * Visit a parse tree produced by {@link ailParser#expr}.
 	 * @param ctx the parse tree
 	 */
@@ -410,11 +396,6 @@ where
 
 	fn visit_unary_op(&mut self, ctx: &Unary_opContext<'input>){
 		let result = <Self as ailVisitorCompat>::visit_unary_op(self, ctx);
-        *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
-	}
-
-	fn visit_binary_op(&mut self, ctx: &Binary_opContext<'input>){
-		let result = <Self as ailVisitorCompat>::visit_binary_op(self, ctx);
         *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
 	}
 
