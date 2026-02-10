@@ -175,7 +175,6 @@ proc bar(baz) {
 - `func copy(obj)`
 - `func find(haystack, needle)`
 - `func len(obj)`
-- `proc path_set(obj, path, value)`
 - `proc remove(obj, prop)`
 - `func reverse(obj)`
 
@@ -228,9 +227,10 @@ proc bar(baz) {
 - `func path_all()`
 
 > [!NOTE]
-> NOTE: when using `path_get` or `path_walk`, ensure array indices are 1-indexed
+> NOTE: when using `path_get`, `path_set` or `path_walk`, ensure array indices are 1-indexed
 
 - `func path_get(dict, path, default)`
+- `proc path_set(obj, path, value)`
 - `func path_walk(dict, path)`
 - `func to_dict(arr)`
 - `func to_pairs(dict)`
