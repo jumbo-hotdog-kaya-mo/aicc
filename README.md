@@ -22,6 +22,9 @@ Compiles source `srcfile` into xml or if `-p` is specified, output into a bunch 
 
 ### Notes
 
+> [!IMPORTANT]
+> When dragging images to app inventor, make sure to also include `images/rt_*.png`
+
 **You most likely want to use `-p` to use outputs for app inventor, it will become the default in a future version**
   
 If `-p` is specified, `outfile` becomes a prefix for generated output pngs (`outfile0.png`, `outfile1.png`, ...)
