@@ -1,0 +1,67 @@
+name: Nightly CI
+
+permissions:
+  contents: write
+
+on:
+  push:
+    branches:
+    - "dev"
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup toolchain
+      run: |
+        rustup target add x86_64-pc-windows-gnu
+        sudo apt-get update
+        sudo apt-get install mingw-w64
+    - name: Build
+      run: | 
+        cargo build --target x86_64-unknown-linux-gnu
+        cargo build --target x86_64-pc-windows-gnu
+    - name: Setup artifacts
+      run: |
+        mkdir dist
+        cp target/x86_64-unknown-linux-gnu/debug/aicc dist/aicc-linux-x86_64-debug
+        cp target/x86_64-pc-windows-gnu/debug/aicc.exe dist/aicc-windows-x86_64-debug.exe     
+    - name: Upload Linux artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Linux debug
+        path: dist/aicc-linux-x86_64-debug
+    - name: Upload Windows artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Windows debug
+        path: dist/aicc-windows-x86_64-debug.exe
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup toolchain
+      run: |
+        rustup target add x86_64-pc-windows-gnu
+        sudo apt-get update
+        sudo apt-get install mingw-w64
+    - name: Build
+      run: | 
+        cargo build --release --target x86_64-unknown-linux-gnu
+        cargo build --release --target x86_64-pc-windows-gnu
+    - name: Setup releases
+      run: |
+        mkdir dist
+        cp target/x86_64-unknown-linux-gnu/release/aicc dist/aicc-linux-x86_64
+        cp target/x86_64-pc-windows-gnu/release/aicc.exe dist/aicc-windows-x86_64.exe     
+    - name: Upload releases
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: dev_head
+        name: Nightly Release
+        files: dist/*
+        prerelease: true
