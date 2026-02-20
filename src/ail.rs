@@ -508,6 +508,8 @@ impl<'a> AilVisitorCompat<'a> for Visitor {
             self.visit_for_stmt(&for_stmt)
         } else if let Some(call_stmt) = ctx.call_stmt() {
             self.visit_call_stmt(&call_stmt)
+        } else if let Some(method_stmt) = ctx.method_stmt() {
+            self.visit_method_stmt(&method_stmt)
         } else if let Some(assign_stmt) = ctx.assign_stmt() {
             self.visit_assign_stmt(&assign_stmt)
         } else if let Some(modify_stmt) = ctx.modify_stmt() {
@@ -618,6 +620,34 @@ impl<'a> AilVisitorCompat<'a> for Visitor {
 
             block
         })
+    }
+
+    fn visit_method_stmt(&mut self, ctx: &MethodStmtContext<'a>) -> Self::Return {
+        let component_type = ctx.IDENT(0).unwrap().get_text();
+        let is_generic = ctx.IDENT(2).is_none();
+        let name = ctx.IDENT(if is_generic { 1 } else { 2 }).unwrap().get_text();
+        let instance_name = if is_generic {
+            "".into()
+        } else {
+            ctx.IDENT(1).unwrap().get_text()
+        };
+        let args = ctx.calllist().unwrap().expr_all();
+
+        let mut block = block("component_method", [
+            mutation(AttributeMap::from([
+                ("component_type".into(), component_type),
+                ("method_name".into(), name),
+                ("is_generic".into(), is_generic.to_string()),
+                ("instance_name".into(), instance_name.clone()),
+            ]), []),
+            field("COMPONENT_SELECTOR", &instance_name)
+        ]);
+
+        block.children.extend(args.into_iter().enumerate().map(
+            |(i, expr)| XMLNode::Element(value(&format!("ARG{i}"), self.visit_expr(&expr).unwrap()))
+        ));
+
+        Some(block)
     }
 
     fn visit_assign_expr(&mut self, ctx: &AssignExprContext<'a>) -> Self::Return {

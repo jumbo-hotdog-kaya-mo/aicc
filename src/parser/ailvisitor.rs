@@ -63,6 +63,12 @@ pub trait ailVisitor<'input>: ParseTreeVisitor<'input,ailParserContextType>{
 	fn visit_call_stmt(&mut self, ctx: &Call_stmtContext<'input>) { self.visit_children(ctx) }
 
 	/**
+	 * Visit a parse tree produced by {@link ailParser#method_stmt}.
+	 * @param ctx the parse tree
+	 */
+	fn visit_method_stmt(&mut self, ctx: &Method_stmtContext<'input>) { self.visit_children(ctx) }
+
+	/**
 	 * Visit a parse tree produced by {@link ailParser#assign_stmt}.
 	 * @param ctx the parse tree
 	 */
@@ -218,6 +224,14 @@ pub trait ailVisitorCompat<'input>:ParseTreeVisitorCompat<'input, Node= ailParse
 	 * @param ctx the parse tree
 	 */
 		fn visit_call_stmt(&mut self, ctx: &Call_stmtContext<'input>) -> Self::Return {
+			self.visit_children(ctx)
+		}
+
+	/**
+	 * Visit a parse tree produced by {@link ailParser#method_stmt}.
+	 * @param ctx the parse tree
+	 */
+		fn visit_method_stmt(&mut self, ctx: &Method_stmtContext<'input>) -> Self::Return {
 			self.visit_children(ctx)
 		}
 
@@ -381,6 +395,11 @@ where
 
 	fn visit_call_stmt(&mut self, ctx: &Call_stmtContext<'input>){
 		let result = <Self as ailVisitorCompat>::visit_call_stmt(self, ctx);
+        *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
+	}
+
+	fn visit_method_stmt(&mut self, ctx: &Method_stmtContext<'input>){
+		let result = <Self as ailVisitorCompat>::visit_method_stmt(self, ctx);
         *<Self as ParseTreeVisitorCompat>::temp_result(self) = result;
 	}
 

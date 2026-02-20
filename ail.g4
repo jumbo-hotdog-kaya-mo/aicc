@@ -65,6 +65,7 @@ stmt : if_stmt
      | while_stmt
      | for_stmt
      | call_stmt
+	 | method_stmt
      | assign_stmt
      | modify_stmt;
 
@@ -77,6 +78,7 @@ for_stmt : FOR
            )
            block_stmt;
 call_stmt : IDENT calllist SEMICOLON;
+method_stmt : DOLLAR IDENT (COLON IDENT)? DOT IDENT calllist SEMICOLON;
 assign_stmt : assignlist block_stmt SEMICOLON;
 modify_stmt : lvalue EQUAL expr SEMICOLON;
 

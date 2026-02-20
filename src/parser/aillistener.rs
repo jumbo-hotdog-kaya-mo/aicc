@@ -95,6 +95,16 @@ fn enter_call_stmt(&mut self, _ctx: &Call_stmtContext<'input>) { }
  */
 fn exit_call_stmt(&mut self, _ctx: &Call_stmtContext<'input>) { }
 /**
+ * Enter a parse tree produced by {@link ailParser#method_stmt}.
+ * @param ctx the parse tree
+ */
+fn enter_method_stmt(&mut self, _ctx: &Method_stmtContext<'input>) { }
+/**
+ * Exit a parse tree produced by {@link ailParser#method_stmt}.
+ * @param ctx the parse tree
+ */
+fn exit_method_stmt(&mut self, _ctx: &Method_stmtContext<'input>) { }
+/**
  * Enter a parse tree produced by {@link ailParser#assign_stmt}.
  * @param ctx the parse tree
  */
