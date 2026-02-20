@@ -462,7 +462,7 @@ impl<'a> AilVisitorCompat<'a> for Visitor {
                     ("instance_name".into(), ctx.IDENT(1).unwrap().get_text()),
                     ("event_name".into(), ctx.IDENT_all().last().unwrap().get_text())
                 ]), []),
-                field("COMPONENT_SELECTOR", &ctx.IDENT(0).unwrap().get_text()),
+                field("COMPONENT_SELECTOR", &ctx.IDENT(1).unwrap().get_text()),
                 statement("DO", self.visit_block_stmt(&ctx.block_stmt().unwrap()))
         ]);
 
