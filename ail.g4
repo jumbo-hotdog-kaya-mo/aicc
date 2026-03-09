@@ -112,7 +112,7 @@ rvalue : DOLLAR IDENT COLON IDENT
 
 lvalue : IDENT (LBRACKET expr RBRACKET)?
        | GLOBAL IDENT (LBRACKET expr RBRACKET)?
-       | DOLLAR IDENT COLON IDENT DOT IDENT;
+       | DOLLAR IDENT (COLON IDENT | LPAREN expr RPAREN) DOT IDENT;
 
 assign_expr : assignlist block_expr;
 call_expr : IDENT calllist;

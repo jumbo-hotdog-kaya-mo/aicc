@@ -312,12 +312,18 @@ impl Visitor {
                     ("component_type".into(), ctx.IDENT(0).unwrap().get_text()),
                     ("set_or_get".into(), if expr.is_some() { "set" } else { "get" }.into()),
                     ("property_name".into(), ctx.IDENT_all().last().unwrap().get_text()),
-                    ("is_generic".into(), (ctx.IDENT_all().len() == 2).to_string()),
+                    ("is_generic".into(), ctx.LPAREN().is_some().to_string()),
                     ("instance_name".into(), ctx.IDENT(1).unwrap().get_text()),
                 ]), []),
-                field("COMPONENT_SELECTOR", &ctx.IDENT(1).unwrap().get_text()),
                 field("PROP", &ctx.IDENT_all().last().unwrap().get_text())
             ]);
+
+            block.children.push(XMLNode::Element(if ctx.LPAREN().is_some() {
+                value("COMPONENT", self.visit_expr(&ctx.expr().unwrap()).unwrap())
+            } else {
+
+                field("COMPONENT_SELECTOR", &ctx.IDENT(1).unwrap().get_text())
+            }));
 
             if let Some(expr) = expr {
                 block.children.push(XMLNode::Element(value("VALUE", self.visit_expr(expr).unwrap())));
