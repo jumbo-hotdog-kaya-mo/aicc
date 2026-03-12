@@ -464,7 +464,7 @@ impl<'a> AilVisitorCompat<'a> for Visitor {
         let block = block("component_event", [
                 mutation(AttributeMap::from([
                     ("component_type".into(), ctx.IDENT(0).unwrap().get_text()),
-                    ("is_generic".into(), (ctx.IDENT_all().len() == 2).to_string()),
+                    ("is_generic".into(), ctx.COLON().is_none().to_string()),
                     ("instance_name".into(), ctx.IDENT(1).unwrap().get_text()),
                     ("event_name".into(), ctx.IDENT_all().last().unwrap().get_text())
                 ]), []),
