@@ -857,14 +857,16 @@ impl<'a> AilVisitorCompat<'a> for Visitor {
         } else if let Some(number) = ctx.NUMBER() {
             let s = &number.get_text();
             let num = if let Some(hex) = s.strip_prefix("0x").or_else(|| s.strip_prefix("0X")) {
-                i64::from_str_radix(hex, 16)
+                i64::from_str_radix(hex, 16).expect("ICE: unhandled numeric syntax error from antlr") as f64
             } else if let Some(bin) = s.strip_prefix("0b").or_else(|| s.strip_prefix("0B")) {
-                i64::from_str_radix(bin, 2)
+                i64::from_str_radix(bin, 2).expect("ICE: unhandled numeric syntax error from antlr") as f64
+            } else if s.contains(".") {
+                s.parse::<f64>().expect("ICE: unhandled numeric syntax error from antlr") as f64
             } else if s.starts_with("0") {
-                i64::from_str_radix(s, 8)
+                i64::from_str_radix(s, 8).expect("ICE: unhandled numeric syntax error from antlr") as f64
             } else {
-                i64::from_str_radix(s, 10)
-            }.expect("ICE: unhandled numeric syntax error from antlr");
+                i64::from_str_radix(s, 10).expect("ICE: unhandled numeric syntax error from antlr") as f64
+            };
 
             Some(block("math_number", [
                 field("NUM", 
